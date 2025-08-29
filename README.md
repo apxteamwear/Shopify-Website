@@ -41,7 +41,7 @@ No other changes are needed — the app will automatically use the new data.
 **2. Updating Branding or Email Routing:**  
 If the APX logo or email signature changes, you can replace the image files on GitHub and the app will reflect them instantly as long as they have the same name.  
 
-If sales reps change, you can update their email addresses in the Apps Script code (app.gs) under:  
+If sales reps change, you can update their email addresses in the Apps Script code (app.js) under:  
 
 ```javascript
 const jamesEmail = "newemail@example.com";
