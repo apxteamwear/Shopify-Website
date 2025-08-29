@@ -145,6 +145,7 @@ async function buildForm() {
   const urlParams = new URLSearchParams(window.location.search);
   const customerName = urlParams.get("name") || "";
   const clubName = urlParams.get("clubName") || customerName; // fallback if clubName missing
+  const teamName = urlParams.get("teamName") || "";
   const email = urlParams.get("email") || "";
   const phone = urlParams.get("phone") || "";
   const salesManager = urlParams.get("salesManager") || "";
@@ -164,6 +165,7 @@ async function buildForm() {
 
   form.innerHTML += `<input type="hidden" name="name" value="${customerName}">
                      <input type="hidden" name="clubName" value="${clubName}">
+                     <input type="hidden" name="teamName" value="${teamName}">
                      <input type="hidden" name="email" value="${email}">
                      <input type="hidden" name="phone" value="${phone}">
                      <input type="hidden" name="salesManager" value="${salesManager}">
