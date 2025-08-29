@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>APX Order Cost Calculator</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <header class="logo-container">
+    <div class="logo-wrapper">
+      <picture id="logoPicture">
+        <!-- Portrait logos on small screens -->
+        <source media="(max-width: 600px)" id="portraitSource" srcset="">
+        <!-- Landscape logos on larger screens -->
+        <source id="landscapeSource" srcset="">
+        <!-- Fallback -->
+        <img id="logoImg"
+             src="https://raw.githubusercontent.com/AkhHas2005/APX/main/img/APX-Landscape-Black.png"
+             alt="APX Performance Logo">
+      </picture>
+      <button id="modeToggle" title="Switch theme">🌙</button>
+    </div>
+  </header>
+
+  <h1>APX Order Cost Calculator</h1>
+
+  <section id="controls">
+    <label for="tier" title="Select the pricing tier to apply across all products.">Pricing Tier:</label>
+    <select id="tier" title="Select the pricing tier to apply across all products.">
+      <option value="C">C</option>
+      <option value="B">B</option>
+      <option value="A">A</option>
+      <option value="A+">A+</option>
+    </select>
+
+    <label for="discount" title="Enter a discount percentage to apply across all products.">Discount (%):</label>
+    <input type="number" id="discount" value="0"
+           title="Enter a discount percentage to apply across all products." />
+
+    <button id="loadData"
+            title="Loads product data from the master price list. Only needed once.">
+      Load Product Data
+    </button>
+  </section>
+
+  <section id="search">
+    <label for="searchInput"><strong>Search Product Code or Name:</strong></label>
+    <input type="text" id="searchInput" placeholder="Type to filter..."
+           title="Type part of a product name or code to filter dropdowns" />
+  </section>
+
+  <section id="productList"></section>
+
+  <section id="summary">
+    <h2>Order Summary</h2>
+    <div id="results"></div>
+  </section>
+
+  <script src="script.js"></script>
+</body>
+</html>

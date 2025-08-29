@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Select Sizes & Quantities</title>
+  <style>
+  @font-face {
+  font-family: 'Brown Std';
+  src: url('https://raw.githubusercontent.com/AkhHas2005/APX/main/fonts/BrownStd-Bold.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Brown Std';
+  src: url('https://raw.githubusercontent.com/AkhHas2005/APX/main/fonts/BrownStd-Regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Brown Std';
+  src: url('https://raw.githubusercontent.com/AkhHas2005/APX/main/fonts/BrownStd-Light.otf') format('opentype');
+  font-weight: 300;
+  font-style: normal;
+}
+/* Bold for headings */
+h1, h2, h3 {
+  font-family: 'Brown Std', Arial, sans-serif;
+  font-weight: 700;
+}
+
+/* Light for buttons and helper text */
+button {
+  font-family: 'Brown Std', Arial, sans-serif;
+  font-weight: 300;
+}
+
+/* Regular for everything else */
+body,
+p,
+label,
+input,
+select,
+thead,
+tbody,
+h4,
+h5,
+h6 {
+  font-family: 'Brown Std', Arial, sans-serif;
+  font-weight: 400;
+}
+
+  :root {
+    --apx-black: #191938;
+    --apx-red: #C10000;
+    --apx-light-grey: #ECECEC;
+    --apx-dark-grey: #5B5B5B;
+    --font-primary: 'Arial', sans-serif;
+  }
+
+  body {
+    font-family: var(--font-primary);
+    margin: 20px;
+    position: relative;
+    padding-top: 80px;
+  }
+
+  h2, h3 {
+    color: var(--apx-black);
+  }
+
+  .apx-logo {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    max-width: 180px;
+    height: auto;
+    z-index: 1000;
+  }
+
+  @media (max-width: 600px) {
+    .apx-logo {
+      max-width: 120px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .apx-logo {
+      content: url('https://raw.githubusercontent.com/AkhHas2005/APX/main/img/APX-Portrait-Black.png');
+      max-width: 100px;
+    }
+  }
+
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-bottom: 20px;
+    table-layout: fixed;
+  }
+
+  th, td {
+    border: 1px solid #ccc;
+    padding: 8px;
+    text-align: center;
+    overflow: hidden;
+  }
+
+  img {
+    max-width: 150px;
+  }
+
+  .table-wrapper {
+    overflow-x: auto;
+    margin-bottom: 20px;
+  }
+
+  .select-all-btn {
+    background: var(--apx-red);
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 12px;
+  }
+
+  .select-all-btn:hover {
+    background: #a00000;
+  }
+
+  button[type="submit"] {
+    background: var(--apx-black);
+    color: white;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+  }
+
+  button[type="submit"]:hover {
+    background: #000;
+  }
+</style>
+
+  <!-- Load unified logic -->
+  <script src="main.js"></script>
+</head>
+<body>
+  <img src="https://raw.githubusercontent.com/AkhHas2005/APX/main/img/APX-Landscape-Black.png" alt="APX Performance Logo" class="apx-logo">
+  <h2 id="formHeading">Select Sizes & Quantities</h2>
+  <form id="sizeForm" method="POST" action="https://script.google.com/macros/s/AKfycbxL5ehds4Emw4xAESZkWKszNCdFHDdnKLV-Id4POGgxMqdnlpMwufljbJXCSHprK5RNNw/exec" target="hidden_iframe" onsubmit="formSubmitted = true;">
+  <!-- form content will be injected here -->
+  </form>
+  <iframe name="hidden_iframe" style="display:none;" onload="showConfirmation()"></iframe>
+  <div id="responseMsg" style="margin-top: 20px; font-weight: bold"></div>
+</body>
+</html>
