@@ -1,5 +1,5 @@
 const csvUrl =
-  "https://raw.githubusercontent.com/AkhHas2005/APX/main/Product%20Links%20-%20ProductData.csv";
+  "https://cdn.shopify.com/s/files/1/0904/2057/6591/files/Product_Links_-_ProductData.csv?v=1756453833";
 
 let formSubmitted = false;
 
