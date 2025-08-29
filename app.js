@@ -1,301 +1,3 @@
-function doGet(e) {
-  const params = e.parameter;
-  const customerName = params.name || "";
-  const email = params.email || "";
-  const phone = params.phone || "";
-  const salesManager = params.salesManager || "";
-  const selectedProducts = params.products ? params.products.split(",").map(p => decodeURIComponent(p.trim())) : [];
-
-  Logger.log("📥 doGet parameters: " + JSON.stringify(params));
-  Logger.log("📞 Contact number: " + phone);
-  Logger.log("👤 Sales Manager: " + salesManager);
-  Logger.log("🧾 Selected products: " + JSON.stringify(selectedProducts));
-
-  if (selectedProducts.length === 0) {
-    return HtmlService.createHtmlOutput(showInitialForm())
-      .setTitle("Start Your Kit Order")
-      .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
-  }
-
-  return HtmlService.createHtmlOutput(showSizeForm(customerName, email, phone, selectedProducts, salesManager))
-    .setTitle("Select Sizes & Quantities")
-    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
-}
-
-function showInitialForm() {
-  const categories = {
-    Tops: [
-      "Match T-Shirt", "Match Shirt (Long Sleeve)", "Goalkeeper Shirt (Long Sleeve)",
-      "Training T-Shirt", "Polo Shirt", "Leisure T-Shirt",
-      "Crew Neck Training Sweatshirt", "1/4 Zip Sweatshirt", "Full Zip Tracksuit Top", "Zipped Hoodie"
-    ],
-    Bottoms: ["Match Shorts", "Training Shorts", "Leisure Shorts", "Track Pants"],
-    Accessories: ["Training Glove", "Training Socks", "Match Socks", "Player Towel", "Club Backpack"]
-  };
-
-  const oneSizeItems = ["Player Towel", "Club Backpack"];
-
-  let html = `
-    <h2>Start Your Kit Order</h2>
-    <form id="initialForm">
-      <label>Name:</label><br><input type="text" name="name" required><br>
-      <label>Email:</label><br><input type="email" name="email" required><br>
-
-      <label>Sales Manager:</label><br>
-      <select name="salesManager" required>
-        <option value="">Choose 1</option>
-        <option value="James">James</option>
-        <option value="Craig">Craig</option>
-      </select><br>
-      <div style="color:red; font-size:0.9em; margin-bottom:10px;">
-        This is your Sales rep from APX – either James or Craig
-      </div>
-
-      <label>Phone Number:</label><br>
-      <input type="text" id="phone" name="phone" required><br>
-      <div id="phoneError" style="color:red; font-weight:bold; display:none;">Please enter a valid phone number.</div><br>
-
-      <label>Club Name:</label><br><input type="text" name="clubName"><br><br>
-  `;
-
-  for (const [category, products] of Object.entries(categories)) {
-    html += `<h3>${category}</h3><table style="width:100%; border-collapse:collapse;">`;
-
-    products.forEach(product => {
-      const isSingleSize = oneSizeItems.includes(product);
-
-      html += `<tr>`;
-      if (isSingleSize) {
-        html += `
-          <td colspan="2">
-            <label>
-              <input type="checkbox" name="products" value="${product}">
-              ${product} (One Size)
-            </label>
-          </td>
-        `;
-      } else {
-        html += `
-          <td style="padding:5px;">
-            <label>
-              <input type="checkbox" name="products" value="Junior ${product}">
-              ${product} (Junior)
-            </label>
-          </td>
-          <td style="padding:5px;">
-            <label>
-              <input type="checkbox" name="products" value="Adult ${product}">
-              ${product} (Adult)
-            </label>
-          </td>
-        `;
-      }
-
-      html += `</tr>`;
-    });
-
-    html += `</table><br>`;
-  }
-
-  html += `
-      <button type="submit">Continue</button>
-    </form>
-    <script>
-      document.getElementById('initialForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        const formData = new FormData(this);
-        const phone = formData.get('phone');
-        const regex = /^(?:\\+44\\s?7\\d{3}|\\(?07\\d{3}\\)?)\\s?\\d{3}\\s?\\d{3}$/;
-
-        const phoneError = document.getElementById("phoneError");
-        if (!regex.test(phone)) {
-          phoneError.style.display = "block";
-          return;
-        } else {
-          phoneError.style.display = "none";
-        }
-
-        const name = encodeURIComponent(formData.get('clubName'));
-        const email = encodeURIComponent(formData.get('email'));
-        const phoneEncoded = encodeURIComponent(phone);
-        const salesManager = encodeURIComponent(formData.get('salesManager'));
-        const selected = formData.getAll('products');
-        if (selected.length === 0) {
-          alert("Please select at least one product.");
-          return;
-        }
-        const products = selected.map(p => encodeURIComponent(p)).join(',');
-        const scriptUrl = 'https://script.google.com/macros/s/AKfycbxL5ehds4Emw4xAESZkWKszNCdFHDdnKLV-Id4POGgxMqdnlpMwufljbJXCSHprK5RNNw/exec';
-        const redirectUrl = scriptUrl + '?name=' + name + '&email=' + email + '&phone=' + phoneEncoded + '&salesManager=' + salesManager + '&products=' + products;
-        window.location.href = redirectUrl;
-      });
-    </script>
-  `;
-
-  return html;
-}
-
-
-function getProductDataMap() {
-  const sheet = SpreadsheetApp.openById('1E7WxmHsE29Zxk-CMloE24p6F73EVuwbiB9gZxgFQcV0').getSheetByName('ProductData');
-  const data = sheet.getDataRange().getValues();
-
-  const map = {};
-  for (let i = 1; i < data.length; i++) {
-    const [name, imageUrl, sizes] = data[i];
-    if (name) {
-      map[name.trim()] = {
-        image: imageUrl,
-        sizes: (sizes || "").split(",").map(s => s.trim())
-      };
-    }
-  }
-  return map;
-}
-
-function showSizeForm(name, email, phone, products, salesManager) {
-  const productMap = getProductDataMap();
-
-  const normalizeProductName = n => {
-    if (n.startsWith("Junior ")) return n.replace("Junior ", "") + " (Junior)";
-    if (n.startsWith("Adult ")) return n.replace("Adult ", "") + " (Adult)";
-    return n;
-  };
-
-  const personalisedItems = {
-    nameAndNumber: [
-      "Match T-Shirt", "Match Shirt (Long Sleeve)",
-      "Goalkeeper Shirt (Long Sleeve)", "Training T-Shirt",
-      "1/4 Zip Sweatshirt", "Zipped Hoodie"
-    ],
-    numberOnly: [
-      "Track Pants", "Match Shorts"
-    ]
-  };
-
-  const mappedProducts = products.map((original, i) => {
-    const trueName = normalizeProductName(original);
-    const data = productMap[trueName] || {};
-    let sizes = (data.sizes || []).map(s => s.trim()).filter(s => s);
-    if (sizes.length === 0) sizes = ["One Size"];
-    return { originalLabel: original, trueName, index: i, sizes, image: data.image || "" };
-  });
-
-  let html = `<h2>Select Sizes & Quantities for ${name}</h2><form id="sizeForm">`;
-  html += `<input type="hidden" name="name" value="${name}">`;
-  html += `<input type="hidden" name="email" value="${email}">`;
-  html += `<input type="hidden" name="phone" value="${phone}">`;
-  html += `<input type="hidden" name="salesManager" value="${salesManager}">`;
-  html += `<input type="hidden" name="productCount" value="${products.length}">`;
-
-  mappedProducts.forEach(({ trueName, index, sizes, image }) => {
-    const productId = `product_${index}`;
-    const baseName = trueName.replace(/ \(Junior\)| \(Adult\)/, "");
-    html += `<h3 style="margin-top:30px;">${trueName}</h3>`;
-    html += `<input type="hidden" name="${productId}_name" value="${trueName}">`;
-
-    html += `<table border="1" cellpadding="6" style="border-collapse:collapse; text-align:center; width:100%;"><thead>
-      <tr>
-        <th>${image ? `<img src="${image}" style="max-width:150px;">` : ""}</th>
-        ${sizes.map(size => `<th>${size}</th>`).join("")}
-      </tr>
-    </thead><tbody>
-      <tr>
-        <td>Qty</td>
-        ${sizes.map(size => `
-          <td>
-            <input type="number" name="${productId}_${size}" min="0" value="0" style="width:60px;"
-              oninput="updatePersonalisation('${productId}', '${trueName}', '${size}', this.value)">
-          </td>
-        `).join("")}
-      </tr>
-    </tbody></table>`;
-
-    if (personalisedItems.nameAndNumber.includes(baseName)) {
-      html += `
-        <h4 style="margin-top:10px;">Personalisation for ${trueName}</h4>
-        <table border="1" cellpadding="6" style="border-collapse:collapse; width:100%; text-align:center;">
-          <thead><tr><th>Name</th><th>Number</th><th>Size</th></tr></thead>
-          <tbody id="${productId}_personalisationBody"></tbody>
-        </table>`;
-    } else if (personalisedItems.numberOnly.includes(baseName)) {
-      html += `
-        <h4 style="margin-top:10px;">Personalisation for ${trueName}</h4>
-        <table border="1" cellpadding="6" style="border-collapse:collapse; width:100%; text-align:center;">
-          <thead><tr><th>Number</th><th>Size</th></tr></thead>
-          <tbody id="${productId}_personalisationBody"></tbody>
-        </table>`;
-    }
-  });
-
-  html += `
-    <h3 style="margin-top:30px;">Delivery Address</h3>
-    <textarea name="deliveryAddress" rows="4" cols="50" required placeholder="Enter full delivery address"></textarea>
-    <br><br>
-    <button type="submit">Submit Final Order</button>
-  </form>
-  <div id="responseMsg" style="margin-top:20px; font-weight:bold;"></div>
-  
-  <script>
-    function updatePersonalisation(productId, trueName, size, count) {
-      const baseName = trueName.replace(/ \\(Junior\\)| \\(Adult\\)/, "");
-      const tbody = document.getElementById(productId + '_personalisationBody');
-      if (!tbody) return;
-      const currentRows = tbody.querySelectorAll('tr[data-size="' + size + '"]');
-
-      count = parseInt(count);
-      if (!count || count <= 0) {
-        currentRows.forEach(row => row.remove());
-        return;
-      }
-
-      const diff = count - currentRows.length;
-
-      for (let i = currentRows.length; i < count; i++) {
-        const tr = document.createElement('tr');
-        tr.setAttribute('data-size', size);
-
-        if (${JSON.stringify(personalisedItems.nameAndNumber)}.includes(baseName)) {
-          tr.innerHTML += '<td><input type="text" name="' + productId + '_name_' + size + '_' + i + '" placeholder="Optional"></td>';
-          tr.innerHTML += '<td><input type="text" name="' + productId + '_number_' + size + '_' + i + '" placeholder="Optional"></td>';
-        } else if (${JSON.stringify(personalisedItems.numberOnly)}.includes(baseName)) {
-          tr.innerHTML += '<td><input type="text" name="' + productId + '_number_' + size + '_' + i + '" placeholder="Optional"></td>';
-        }
-
-        tr.innerHTML += '<td><input type="hidden" name="' + productId + '_size_' + size + '_' + i + '" value="' + size + '">' + size + '</td>';
-        tbody.appendChild(tr);
-      }
-
-      for (let i = currentRows.length - 1; i >= count; i--) {
-        currentRows[i].remove();
-      }
-    }
-
-    document.getElementById('sizeForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const data = new FormData(this);
-      google.script.run
-        .withSuccessHandler(function(msg) {
-          document.body.innerHTML = msg;
-        })
-        .withFailureHandler(function(error) {
-          document.getElementById('responseMsg').innerText = "❌ Submission failed.";
-          console.error(error);
-        })
-        .handleFormSubmission(Object.fromEntries(data.entries()), "${email}");
-    });
-  </script>
-  `;
-
-  return html;
-}
-
-function handleFormSubmission(params, emailAddress) {
-  const productMap = getProductDataMap();
-  const salesManager = params.salesManager || "";
-  return doPost({ parameter: params }, emailAddress, productMap, salesManager);
-}
-
 function doPost(e) {
   const data = e.parameter;
   const emailAddress = data.email || "default@example.com";
@@ -310,6 +12,7 @@ function doPostInternal(e, emailAddress, productMap, salesManager) {
   const p = e.parameter;
   const name = p.name || "Customer";
   const club = p.clubName || "Club";
+  const team = p.teamName || "Not Applicable";
   const email = emailAddress || p.email || "akhtarhasan2005@gmail.com";
   const phone = p.phone || "Not Provided";
   const address = p.deliveryAddress || "Not Provided";
@@ -317,8 +20,10 @@ function doPostInternal(e, emailAddress, productMap, salesManager) {
 
   const jamesEmail = "james@apxteamwear.com";
   const craigEmail = "craig@apxteamwear.com";
+  const jordanEmail = "jordan@apxteamwear.com";
   const managerEmail = salesManager === "James" ? jamesEmail :
                        salesManager === "Craig" ? craigEmail :
+                       salesManager === "Jordan" ? jordanEmail :
                        "sales@apxteamwear.com";
 
   Logger.log(`📬 Processing order for ${club} (${email}), Products: ${productCount}`);
@@ -383,7 +88,21 @@ function doPostInternal(e, emailAddress, productMap, salesManager) {
   }
 
   Logger.log("📦 Final Order Summary:\n" + orderSummary);
-  const clientSummary = orderSummary;
+  const clientSummary = `
+👤 Your Name: ${name}
+🏘️ Your Club Name: ${club}
+🫂 Your Team Name/Coach: ${team}
+📧 Your Email: ${email}
+📞 Your Phone Number: ${phone}
+📦 Your Delivery Address:
+${address}
+
+—
+
+${orderSummary}
+
+Attached is the spreadsheet for your order.
+`;
 
   const file = generateOrderSpreadsheet(p, club, sizeQtyMaps);
   Utilities.sleep(1000);
@@ -391,20 +110,21 @@ function doPostInternal(e, emailAddress, productMap, salesManager) {
   const driveLink = `https://drive.google.com/file/d/${file.getId()}/view`;
 
   const companySummary = `
-    👤 Customer Name: ${name}
-    🏘️ Club Name: ${club}
-    📧 Email: ${email}
-    📞 Phone: ${phone}
-    📦 Delivery Address:
-    ${address}
+👤 Customer Name: ${name}
+🏘️ Club Name: ${club}
+🫂 Team Name/Coach: ${team}
+📧 Email: ${email}
+📞 Phone: ${phone}
+📦 Delivery Address:
+${address}
 
-    —
+—
 
-    ${orderSummary}
+${orderSummary}
 
-    🔗 Google Sheets Link to Edit Spreadsheet in browser:
-    ${driveLink}
-    `;
+🔗 Google Sheets Link to Edit Spreadsheet in browser:
+${driveLink}
+`;
 
   MailApp.sendEmail({
     to: managerEmail,
@@ -442,7 +162,8 @@ function doPostInternal(e, emailAddress, productMap, salesManager) {
             <img src="https://raw.githubusercontent.com/apxteamwear/Shopify-Website/main/img/APX%20-%20Email%20Sig%2001.jpeg" alt="APX Signature" style="max-width: 400px;">
           </div>
         </div>
-      `
+      `,
+      attachments: [excelBlob]
     });
   }
 
@@ -473,6 +194,8 @@ function generateOrderSpreadsheet(p, name, sizeQtyMaps) {
   const TEMPLATE_ID = '1XSD8U61u4loh6j-ulQGMsaJ6EiT95zDR0X4_liHXbhQ';
   const FOLDER_ID   = '1QKzgRa9MbTUEX0CFhkl8vKfSz-vAwE-E';
   const clubName    = name || "Club";
+  const teamName    = p.teamName || "";
+  const address     = p.deliveryAddress || "Not Provided";
 
   const template = SpreadsheetApp.openById(TEMPLATE_ID);
   const copy     = template.copy(`Order – ${clubName} – ${Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "dd/MM/yyyy")}`);
@@ -485,6 +208,8 @@ function generateOrderSpreadsheet(p, name, sizeQtyMaps) {
   sheet.getRange("G3").setValue(Utilities.formatDate(new Date(Date.now() + 28*24*60*60*1000), Session.getScriptTimeZone(), "dd/MM/yyyy"));
   sheet.getRange("E5").setValue(clubName);
   sheet.getRange("L5").setValue("NEW");
+  sheet.getRange("M6").setValue(teamName);
+  sheet.getRange("R3").setValue(address);
 
   const sizeColumns = {
     "YXXS": 10, "YXS": 11, "YS": 12, "YM": 13, "YL": 14,
