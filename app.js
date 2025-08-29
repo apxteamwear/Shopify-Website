@@ -412,13 +412,13 @@ function doPostInternal(e, emailAddress, productMap, salesManager) {
     htmlBody: `
       <div style="font-family: Arial, sans-serif; padding: 20px;">
         <div style="text-align: right;">
-          <img src="https://raw.githubusercontent.com/AkhHas2005/APX/main/img/APX-Landscape-Black.png" alt="APX Logo" style="max-width: 180px;">
+          <img src="https://raw.githubusercontent.com/apxteamwear/Shopify-Website/main/img/APX-Landscape-Black.png" alt="APX Logo" style="max-width: 180px;">
         </div>
         <p>Dear Sales Rep,</p>
         <p>A new kit order has been submitted via the APX Teamwear web app. Below are the client details and order contents:</p>
         <pre style="background:#f9f9f9; padding:10px; border:1px solid #ccc;">${companySummary}</pre>
         <div style="margin-top: 40px; text-align: center;">
-          <img src="https://raw.githubusercontent.com/AkhHas2005/APX/main/img/APX%20-%20Email%20Sig%2001.jpeg" alt="APX Signature" style="max-width: 400px;">
+          <img src="https://raw.githubusercontent.com/apxteamwear/Shopify-Website/main/img/APX%20-%20Email%20Sig%2001.jpeg" alt="APX Signature" style="max-width: 400px;">
         </div>
       </div>
     `,
@@ -432,14 +432,14 @@ function doPostInternal(e, emailAddress, productMap, salesManager) {
       htmlBody: `
         <div style="font-family: Arial, sans-serif; padding: 20px;">
           <div style="text-align: right;">
-            <img src="https://raw.githubusercontent.com/AkhHas2005/APX/main/img/APX-Landscape-Black.png" alt="APX Logo" style="max-width: 180px;">
+            <img src="https://raw.githubusercontent.com/apxteamwear/Shopify-Website/main/img/APX-Landscape-Black.png" alt="APX Logo" style="max-width: 180px;">
           </div>
           <p>Hi ${name} from ${club},</p>
           <p>We received your order. Here’s a summary:</p>
           <pre style="background:#f9f9f9; padding:10px; border:1px solid #ccc;">${clientSummary}</pre>
           <p>If you notice any issues, feel free to reach out to us directly.</p>
           <div style="margin-top: 40px; text-align: center;">
-            <img src="https://raw.githubusercontent.com/AkhHas2005/APX/main/img/APX%20-%20Email%20Sig%2001.jpeg" alt="APX Signature" style="max-width: 400px;">
+            <img src="https://raw.githubusercontent.com/apxteamwear/Shopify-Website/main/img/APX%20-%20Email%20Sig%2001.jpeg" alt="APX Signature" style="max-width: 400px;">
           </div>
         </div>
       `
