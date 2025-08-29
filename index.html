@@ -240,13 +240,11 @@
 
         <label>Sales Manager:</label>
         <select name="salesManager" required>
-          <option value="">Choose 1</option>
+          <option value="Sales">Sales</option>
           <option value="James">James</option>
-          <option value="Craig">Craig</option></select
-        ><br />
-        <div class="sales-manager-note">
-          This is your Sales rep from APX – either James or Craig
-        </div>
+          <option value="Craig">Craig</option>
+          <option value="Jordan">Jordan</option>
+        </select><br />
 
         <label>Phone Number:</label>
         <input type="text" id="phone" name="phone" required /><br />
@@ -254,7 +252,10 @@
         <br />
 
         <label>Club Name:</label>
-        <input type="text" name="clubName" /><br />
+        <input type="text" name="clubName" required /><br />
+
+        <label>Team Name/Coach (Optional):</label>
+        <input type="text" name="teamName" /><br />
       </div>
 
       <div id="productSelection"></div>
@@ -483,6 +484,7 @@
 
           const name = encodeURIComponent(formData.get("name"));
           const club = encodeURIComponent(formData.get("clubName"));
+          const team = encodeURIComponent(formData.get("teamName"));
           const email = encodeURIComponent(formData.get("email"));
           const phoneEncoded = encodeURIComponent(phone);
           const salesManager = encodeURIComponent(formData.get("salesManager"));
@@ -506,7 +508,7 @@
             return `${encodeURIComponent(baseName)}::${ageGroup}`;
           });
 
-          const redirectUrl = `./sizes.html?name=${name}&clubName=${club}&email=${email}&phone=${phoneEncoded}&salesManager=${salesManager}&products=${productPairs.join(
+          const redirectUrl = `./sizes.html?name=${name}&clubName=${club}&teamName=${team}&email=${email}&phone=${phoneEncoded}&salesManager=${salesManager}&products=${productPairs.join(
             ","
           )}`;
 
