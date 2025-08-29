@@ -18,15 +18,15 @@ document.addEventListener("DOMContentLoaded", () => {
     if (window.matchMedia("(max-width: 600px)").matches) {
       console.log("[LOGO] Using portrait logo variant.");
       portraitSource.srcset = isDark
-        ? "https://raw.githubusercontent.com/AkhHas2005/APX/main/img/APX-Portrait-White.png"
-        : "https://raw.githubusercontent.com/AkhHas2005/APX/main/img/APX-Portrait-Black.png";
+        ? "https://raw.githubusercontent.com/apxteamwear/Shopify-Website/main/img/APX-Portrait-White.png"
+        : "https://raw.githubusercontent.com/apxteamwear/Shopify-Website/main/img/APX-Portrait-Black.png";
       landscapeSource.srcset = "";
       logoImg.src = portraitSource.srcset;
     } else {
       console.log("[LOGO] Using landscape logo variant.");
       landscapeSource.srcset = isDark
-        ? "https://raw.githubusercontent.com/AkhHas2005/APX/main/img/APX-Landscape-White.png"
-        : "https://raw.githubusercontent.com/AkhHas2005/APX/main/img/APX-Landscape-Black.png";
+        ? "https://raw.githubusercontent.com/apxteamwear/Shopify-Website/main/img/APX-Landscape-White.png"
+        : "https://raw.githubusercontent.com/apxteamwear/Shopify-Website/main/img/APX-Landscape-Black.png";
       portraitSource.srcset = "";
       logoImg.src = landscapeSource.srcset;
     }
@@ -78,7 +78,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 document.getElementById("loadData").addEventListener("click", async () => {
-  const res = await fetch("https://raw.githubusercontent.com/AkhHas2005/APX/main/data/2024%20Master%20Price%20List.csv");
+  const res = await fetch("https://cdn.shopify.com/s/files/1/0904/2057/6591/files/2024_Master_Price_List.csv?v=1756453886");
   const text = await res.text();
   parseCSV(text);
   if (!hasLoadedOnce) {
