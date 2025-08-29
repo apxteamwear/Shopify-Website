@@ -63,7 +63,7 @@ with this, for example (changing the action part only):
 
 ---
 
-### **Project Overview: APX Order Cost Calculator**
+### Project Summary for APX Sales Calculator
 
 The APX Order Cost Calculator is a custom-built web tool designed to help sales managers quickly calculate product costs, 
 revenue, and profit margins based on live pricing tiers and discounts. 
